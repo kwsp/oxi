@@ -31,15 +31,16 @@ class App(QMainWindow):
         self.setWindowTitle(self._title)
         self.setGeometry(self._left, self._top, self._width, self._height)
 
-        self._canvas = m = PlotCanvas(self, width=5, height=4)
+        self._canvas = PlotCanvas(self, width=5, height=4)
+        self._canvas.move(0, 0)
         self._nscope_worker.output_arr.connect(self._canvas.slot_update_plot)
-        m.move(0, 0)
 
-        self._bt1 = bt1 = QPushButton("A button", self)
+        # TODO: change button to label later just to display data
+        self._bt1 = bt1 = QPushButton("", self)
         bt1.setToolTip("Toolip")
         bt1.move(500, 0)
         bt1.resize(140, 100)
-        bt1.clicked.connect(m.slot_update_plot)
+        bt1.setDisabled(True)
 
         bt_on_off = QPushButton("Start", self)
         bt_on_off.setToolTip("Toggle the oscilloscope")
