@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from PyQt5.QtCore import QThread, pyqtSignal
 import numpy as np
 
@@ -22,35 +24,32 @@ class NScopeWorker(QThread):
         self._n_samples = 500
         self.signal_fs.connect(self.slot_fs_update)
 
+    def _init_nscope(self):
+        if self._ns is None:
+            from nscopeapi import nScope
+
+            self._ns = nScope()
+
     def run(self):
         # run is executed in the new thread
         try:
             # Init nScope if we hasn't already
-            if self._ns is None:
-                from nscopeapi import nScope
-
-                self._ns = nScope()
+            self._init_nscope()
+            assert self._ns is not None
 
             self.signal_running.emit(True)
 
             # init channel 1
             ns = self._ns
             ns.setSampleRateInHz(self._fs)
-            ns.setChannelOn(1, True)  # Turn on channel 1
-            ns.setChannelsOn(True, False, False, False)
+            ns.setChannelsOn(True, False, False, False)  # Turn on channel 1
             counter = 0
             while not self.isInterruptionRequested():
 
-                ns.requestData(self._n_samples)
-
-                data = []
-                while ns.requestHasData():
-                    data.append(ns.readData(1))
-
-                # release request resources
-                ns.releaseRequest()
-
-                self.output_arr.emit(data)
+                with self.sendPulse(1, 1000, 1.5):  # send pulse
+                    # read signal
+                    data = self.readCh(1)
+                    self.output_arr.emit(data)
 
                 counter += 1
                 self.output.emit(counter)
@@ -66,4 +65,30 @@ class NScopeWorker(QThread):
         self.signal_running.emit(False)
 
     def slot_fs_update(self, new_fs: float):
+        "TODO: unused"
         self._fs = new_fs
+
+    def readCh(self, ch: int):
+        ns = self._ns
+        assert ns is not None
+        ns.requestData(self._n_samples)
+        data = []
+        while ns.requestHasData():
+            data.append(ns.readData(ch))
+
+        # release request resources
+        ns.releaseRequest()
+        return data
+
+    @contextmanager
+    def sendPulse(self, ax: int, freq: float, amplitude: float):
+        "Send pulse and turn AX off when context ends"
+        ns = self._ns
+        assert ns is not None
+        try:
+            ns.setAXOn(ax, True)
+            ns.setAXFrequencyInHz(ax, freq)
+            ns.setAXAmplitude(ax, amplitude)
+            yield
+        finally:
+            ns.setAXOn(ax, False)

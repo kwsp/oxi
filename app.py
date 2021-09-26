@@ -1,10 +1,14 @@
 import sys
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
+    QGroupBox,
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QSlider,
+    QVBoxLayout,
 )
 
 from NScopeWorker import NScopeWorker
@@ -37,17 +41,31 @@ class App(QMainWindow):
 
         # TODO: change button to label later just to display data
         self._bt1 = bt1 = QPushButton("", self)
-        bt1.setToolTip("Toolip")
+        bt1.setToolTip("No. of cycles collected")
         bt1.move(500, 0)
         bt1.resize(140, 100)
         bt1.setDisabled(True)
 
+        # Button to toggle nScope
         bt_on_off = QPushButton("Start", self)
         bt_on_off.setToolTip("Toggle the oscilloscope")
         bt_on_off.move(500, 100)
         bt_on_off.resize(140, 100)
         bt_on_off.clicked.connect(self.toggleOnOff)
         self._buttonOnOff = bt_on_off
+
+        # resolution slider
+        sliderGroup = QGroupBox("Resolution", self)
+        slider = QSlider(Qt.Horizontal, self)
+        slider.setTickPosition(QSlider.TicksBothSides)
+        slider.setTickInterval(5)
+        slider.setSingleStep(1)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(slider)
+        sliderGroup.setLayout(vbox)
+        sliderGroup.resize(140, 100)
+        sliderGroup.move(500, 200)
 
         self.show()
 

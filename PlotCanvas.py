@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from PyQt5.QtWidgets import (
     QSizePolicy,
 )
@@ -10,6 +12,7 @@ class PlotCanvas(FigureCanvas):
     """
     Custom QT5 widget for a matplotlib plot
     """
+
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self._axes = fig.add_subplot(111)
@@ -22,7 +25,7 @@ class PlotCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
         self._data = []
-        self._ylim = (-5, 5)
+        self._ylim: Tuple[float, float] = (-5, 5)
         self.plot()
 
     def plot(self):
@@ -35,3 +38,6 @@ class PlotCanvas(FigureCanvas):
     def slot_update_plot(self, arr):
         self._data = arr
         self.plot()
+
+    def slot_update_ylim(self, ylim: Tuple[float, float]):
+        self.ylim = ylim
