@@ -1,0 +1,4 @@
+numpy
+matplotlib
+PyQt5
+nscopeapi # https://github.com/nLabs-nScope/nScopeAPI
