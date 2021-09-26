@@ -1,4 +1,4 @@
 numpy
-matplotlib
-PyQt5
-nscopeapi # https://github.com/nLabs-nScope/nScopeAPI
+matplotlib  # requires >3.5 to support Qt6, currently in dev
+pyqt6
+# nscopeapi # https://github.com/nLabs-nScope/nScopeAPI

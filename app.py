@@ -1,7 +1,6 @@
 import sys
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QApplication,
     QGroupBox,
     QMainWindow,
@@ -52,12 +51,14 @@ class App(QMainWindow):
         bt_on_off.move(500, 100)
         bt_on_off.resize(140, 100)
         bt_on_off.clicked.connect(self.toggleOnOff)
+        bt_on_off.click
+        bt_on_off.click
         self._buttonOnOff = bt_on_off
 
         # resolution slider
         sliderGroup = QGroupBox("Resolution", self)
-        slider = QSlider(Qt.Horizontal, self)
-        slider.setTickPosition(QSlider.TicksBothSides)
+        slider = QSlider(self)
+        slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         slider.setTickInterval(5)
         slider.setSingleStep(1)
 
@@ -87,7 +88,8 @@ class App(QMainWindow):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("Error")
         msg_box.setText(err_msg)
-        msg_box.setIcon(QMessageBox.Warning)
+        QMessageBox.clickedButton
+        msg_box.setIcon(QMessageBox.Icon.Warning)
         msg_box.exec_()
 
     def toggleOnOff(self):
@@ -109,4 +111,4 @@ class App(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = App()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

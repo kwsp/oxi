@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 import numpy as np
 
 
