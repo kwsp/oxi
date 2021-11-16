@@ -20,7 +20,7 @@ class NScopeWorker(QThread):
         QThread.__init__(self, parent)
 
         self._ns = None
-        self._fs = 10000
+        self._fs = 1000
         self._n_samples = 500
         self.signal_fs.connect(self.slot_fs_update)
 
@@ -46,10 +46,32 @@ class NScopeWorker(QThread):
             counter = 0
             while not self.isInterruptionRequested():
 
-                with self.sendPulse(1, 1000, 1.5):  # send pulse
-                    # read signal
-                    data = self.readCh(1)
-                    self.output_arr.emit(data)
+                # AX1 is the red LED, 650nm
+                # with self.sendSineWave(1, 1000, 1.5):  # send pulse
+                # read signal
+                self._n_samples = 5000
+                data = self.readCh(1)  # array of self._n_samples (500) points
+                # calculate the peak and trough of the sine wave
+                self.output_arr.emit(data)
+
+                # # AX2 is the red LED, 940nm
+                # with self.sendSineWave(2, 1000, 1.5):  # send pulse
+                    # # read signal
+                    # data = self.readCh(1)
+                    # self.output_arr.emit(data)
+
+                # # AX1 is the red LED, 650nm
+                # with self.sendPulseWave(1):
+                    # # read signal
+                    # data = self.readCh(1)  # array of self._n_samples (500) points
+                    # # calculate the peak and trough of the sine wave
+                    # self.output_arr.emit(data)
+
+                # # AX2 is the red LED, 940nm
+                # with self.sendPulseWave(1):
+                    # # read signal
+                    # data = self.readCh(1)
+                    # self.output_arr.emit(data)
 
                 counter += 1
                 self.output.emit(counter)
@@ -81,8 +103,8 @@ class NScopeWorker(QThread):
         return data
 
     @contextmanager
-    def sendPulse(self, ax: int, freq: float, amplitude: float):
-        "Send pulse and turn AX off when context ends"
+    def sendSineWave(self, ax: int, freq: float, amplitude: float):
+        "Send sine wave and turn AX off when context ends"
         ns = self._ns
         assert ns is not None
         try:
@@ -92,3 +114,17 @@ class NScopeWorker(QThread):
             yield
         finally:
             ns.setAXOn(ax, False)
+
+
+    @contextmanager
+    def sendPulseWave(self, px: int, duty: float = 100., periodMs: float = 250.):
+        "Send pulse and turn AX off when context ends"
+        ns = self._ns
+        assert ns is not None
+        try:
+            ns.setPXDutyPercentage(px, duty)
+            ns.setPXPeriodInMs(px, periodMs)
+            ns.setPXOn(px, True)
+            yield
+        finally:
+            ns.setPXOn(px, False)
